@@ -1,0 +1,117 @@
+import { useState } from 'react'
+import Head from 'next/head'
+import axios from 'axios'
+
+export default function Home() {
+  const [url, setUrl] = useState('')
+  const [bypassedUrl, setBypassedUrl] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [username, setUsername] = useState('')
+  const [hasEnteredName, setHasEnteredName] = useState(false)
+
+  const handleBypass = async () => {
+    try {
+      setLoading(true)
+      const response = await axios.get(`https://ethos.kys.gay/api/free/bypass?url=${encodeURIComponent(url)}`)
+      setBypassedUrl(response.data.destination)
+    } catch (error) {
+      alert('Failed to bypass URL. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  if (!hasEnteredName) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black flex flex-col items-center justify-center p-4">
+        <Head>
+          <title>BypassPortal - Your Gateway to Direct Links</title>
+        </Head>
+        <div className="bg-gray-800 p-8 rounded-xl shadow-2xl text-center w-full max-w-md">
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-transparent bg-clip-text mb-2">
+            BypassPortal
+          </h1>
+          <p className="text-gray-400 mb-8">Your Gateway to Direct Links</p>
+          <input
+            type="text"
+            placeholder="Enter your name..."
+            className="w-full bg-gray-700 text-white p-4 rounded-lg mb-4 focus:ring-2 focus:ring-purple-500 focus:outline-none"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && username && setHasEnteredName(true)}
+          />
+          <button
+            onClick={() => username && setHasEnteredName(true)}
+            className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white px-8 py-3 rounded-lg hover:opacity-90 transition duration-300 w-full"
+          >
+            Enter Portal
+          </button>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black p-4">
+      <Head>
+        <title>BypassPortal - Dashboard</title>
+      </Head>
+      <div className="max-w-4xl mx-auto">
+        <div className="bg-gray-800 rounded-xl shadow-2xl p-6">
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-transparent bg-clip-text">
+              BypassPortal
+            </h1>
+            <p className="text-gray-400 mt-2">Welcome, {username}! Ready to bypass some links? 🌀</p>
+          </div>
+
+          <div className="space-y-6">
+            <div className="relative">
+              <input
+                type="text"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                placeholder="Enter URL to bypass..."
+                className="w-full bg-gray-700 text-white p-4 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+              />
+            </div>
+
+            <button
+              onClick={handleBypass}
+              disabled={loading}
+              className={`w-full bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white py-4 rounded-lg hover:opacity-90 transition duration-300 ${
+                loading ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
+            >
+              {loading ? (
+                <span className="flex items-center justify-center">
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Opening Portal...
+                </span>
+              ) : (
+                'Open Portal'
+              )}
+            </button>
+
+            {bypassedUrl && (
+              <div className="mt-6 p-4 bg-gray-700 rounded-lg border border-purple-500/30">
+                <p className="text-white mb-2">Your destination is ready:</p>
+                <a
+                  href={bypassedUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-purple-400 break-all hover:text-purple-300 transition duration-300"
+                >
+                  {bypassedUrl}
+                </a>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
